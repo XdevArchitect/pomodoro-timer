@@ -4,8 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pomodoro Timer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background: transparent;
+            color: white;
+            text-align: center;
+            font-size: 40px;
+            font-weight: 700;
+        }
+        #time {
+            font-size: 80px;
+        }
+        #status {
+            font-size: 40px;
+            margin-top: 10px;
+        }
+        #datetime {
+            font-size: 30px;
+            margin-top: 20px;
+            font-weight: 400;
+        }
+        #progress-container {
+            width: 100%;
+            background-color: #555;
+            height: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            width: 100%;
+            height: 100%;
+            background-color: #4caf50;
+            transition: width 1s linear;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, Pomodoro!</h1>
+    <div id="datetime">Loading...</div>
+    <div id="time">25:00</div>
+    <div id="status">WORK</div>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    
+    <audio id="alarm" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
+    <script>
+        let workTime = 25 * 60, 
+            breakTime = 5 * 60, 
+            isWorking = true, 
+            timeLeft = workTime;
+
+        function updateTimer() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            document.getElementById("time").innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            let progress = (timeLeft / (isWorking ? workTime : breakTime)) * 100;
+            document.getElementById("progress-bar").style.width = progress + "%";
+            
+            if (timeLeft <= 0) {
+                document.getElementById("alarm").play();
+                isWorking = !isWorking;
+                timeLeft = isWorking ? workTime : breakTime;
+                document.getElementById("status").innerText = isWorking ? "WORK" : "BREAK";
+                document.getElementById("progress-bar").style.backgroundColor = isWorking ? "#4caf50" : "#ff9800";
+            }
+
+            timeLeft--;
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById("datetime").innerText = now.toLocaleDateString('en-US', options);
+        }
+
+        setInterval(updateTimer, 1000);
+        setInterval(updateDateTime, 1000);
+    </script>
 </body>
 </html>
